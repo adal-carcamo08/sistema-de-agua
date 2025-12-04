@@ -234,126 +234,87 @@ btnExportPDF.addEventListener('click', () => {
     return;
   }
   
-  // Crear HTML profesional para convertir a PDF
-  let html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Reporte de Agua</title>
-      <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; background: white; }
-        .container { max-width: 900px; margin: 0 auto; padding: 30px; }
-        .header { border-bottom: 3px solid #3b82f6; padding-bottom: 20px; margin-bottom: 30px; text-align: center; }
-        .header h1 { color: #3b82f6; font-size: 26px; margin-bottom: 5px; }
-        .header p { color: #666; font-size: 13px; }
-        .info-box { background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 15px; margin-bottom: 20px; }
-        .info-box p { margin: 5px 0; font-size: 12px; }
-        .section { margin-bottom: 25px; page-break-inside: avoid; }
-        .section h2 { color: #1f2937; font-size: 15px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 15px; }
-        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .data-item { border: 1px solid #e5e7eb; padding: 12px; border-radius: 6px; background: #fafafa; }
-        .data-label { font-weight: bold; color: #3b82f6; font-size: 11px; }
-        .data-value { font-size: 13px; color: #1f2937; margin-top: 5px; }
-        .status-good { color: #10b981; font-weight: bold; }
-        .status-warning { color: #f59e0b; font-weight: bold; }
-        .status-danger { color: #ef4444; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11px; }
-        th { background: #3b82f6; color: white; padding: 10px; text-align: left; font-weight: bold; }
-        td { padding: 8px 10px; border-bottom: 1px solid #e5e7eb; }
-        tr:nth-child(even) { background: #f9fafb; }
-        .footer { margin-top: 40px; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 20px; color: #666; font-size: 10px; }
-        @media print {
-          body { padding: 0; }
-          .container { padding: 20px; }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>SISTEMA DE MONITOREO DE AGUA</h1>
-          <p>Reporte de Datos Históricos • Universidad Don Bosco</p>
-        </div>
-        
-        <div class="info-box">
-          <p><strong>Fecha de generación:</strong> ${new Date().toLocaleString('es-SV')}</p>
-          <p><strong>Total de lecturas:</strong> ${estado.lecturas.length}</p>
-          <p><strong>Periodo:</strong> ${estado.lecturas[0].fecha.toLocaleString('es-SV')} - ${estado.lecturas[estado.lecturas.length-1].fecha.toLocaleString('es-SV')}</p>
-        </div>
-        
-        <div class="section">
-          <h2>📊 Resumen de Indicadores</h2>
-          <div class="data-grid">
-            <div class="data-item">
-              <div class="data-label">Consumo Estimado Hoy</div>
-              <div class="data-value">${estado.consumoHoy.toFixed(2)} m³</div>
-            </div>
-            <div class="data-item">
-              <div class="data-label">Consumo Estimado Mes</div>
-              <div class="data-value">${estado.consumoMes.toFixed(2)} m³</div>
-            </div>
-            <div class="data-item">
-              <div class="data-label">Nivel Promedio Tanque</div>
-              <div class="data-value">${(estado.lecturas.reduce((s, l) => s + l.nivel, 0) / estado.lecturas.length).toFixed(1)}%</div>
-            </div>
-            <div class="data-item">
-              <div class="data-label">Caudal Promedio</div>
-              <div class="data-value">${(estado.lecturas.reduce((s, l) => s + l.caudal, 0) / estado.lecturas.length).toFixed(2)} m³/h</div>
-            </div>
+  // Crear elemento HTML para el PDF
+  const element = document.createElement('div');
+  element.innerHTML = `
+    <div style="padding: 30px; font-family: Arial, sans-serif; color: #333;">
+      <div style="border-bottom: 3px solid #3b82f6; padding-bottom: 20px; margin-bottom: 30px; text-align: center;">
+        <h1 style="color: #3b82f6; font-size: 26px; margin: 0 0 5px 0;">SISTEMA DE MONITOREO DE AGUA</h1>
+        <p style="color: #666; font-size: 13px; margin: 0;">Reporte de Datos Historicos • Universidad Don Bosco</p>
+      </div>
+      
+      <div style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 15px; margin-bottom: 20px;">
+        <p style="margin: 5px 0; font-size: 12px;"><strong>Fecha de generacion:</strong> ${new Date().toLocaleString('es-SV')}</p>
+        <p style="margin: 5px 0; font-size: 12px;"><strong>Total de lecturas:</strong> ${estado.lecturas.length}</p>
+        <p style="margin: 5px 0; font-size: 12px;"><strong>Periodo:</strong> ${estado.lecturas[0].fecha.toLocaleString('es-SV')} - ${estado.lecturas[estado.lecturas.length-1].fecha.toLocaleString('es-SV')}</p>
+      </div>
+      
+      <div style="margin-bottom: 25px;">
+        <h2 style="color: #1f2937; font-size: 15px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 15px;">📊 Resumen de Indicadores</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div style="border: 1px solid #e5e7eb; padding: 12px; border-radius: 6px; background: #fafafa;">
+            <div style="font-weight: bold; color: #3b82f6; font-size: 11px;">Consumo Estimado Hoy</div>
+            <div style="font-size: 13px; color: #1f2937; margin-top: 5px;">${estado.consumoHoy.toFixed(2)} m³</div>
+          </div>
+          <div style="border: 1px solid #e5e7eb; padding: 12px; border-radius: 6px; background: #fafafa;">
+            <div style="font-weight: bold; color: #3b82f6; font-size: 11px;">Consumo Estimado Mes</div>
+            <div style="font-size: 13px; color: #1f2937; margin-top: 5px;">${estado.consumoMes.toFixed(2)} m³</div>
+          </div>
+          <div style="border: 1px solid #e5e7eb; padding: 12px; border-radius: 6px; background: #fafafa;">
+            <div style="font-weight: bold; color: #3b82f6; font-size: 11px;">Nivel Promedio Tanque</div>
+            <div style="font-size: 13px; color: #1f2937; margin-top: 5px;">${(estado.lecturas.reduce((s, l) => s + l.nivel, 0) / estado.lecturas.length).toFixed(1)}%</div>
+          </div>
+          <div style="border: 1px solid #e5e7eb; padding: 12px; border-radius: 6px; background: #fafafa;">
+            <div style="font-weight: bold; color: #3b82f6; font-size: 11px;">Caudal Promedio</div>
+            <div style="font-size: 13px; color: #1f2937; margin-top: 5px;">${(estado.lecturas.reduce((s, l) => s + l.caudal, 0) / estado.lecturas.length).toFixed(2)} m³/h</div>
           </div>
         </div>
-        
-        <div class="section">
-          <h2>💧 Historico Detallado de Lecturas</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Fecha/Hora</th>
-                <th>Nivel (%)</th>
-                <th>Caudal (m³/h)</th>
-                <th>pH</th>
-                <th>Calidad</th>
-                <th>Consumible</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${estado.lecturas.map(l => `
-                <tr>
-                  <td>${l.fecha.toLocaleString('es-SV')}</td>
-                  <td><strong>${l.nivel}%</strong></td>
-                  <td>${l.caudal.toFixed(2)}</td>
-                  <td>${l.pH}</td>
-                  <td><span class="${l.calidad === 'Excelente' ? 'status-good' : l.calidad === 'Normal' ? 'status-warning' : l.calidad === 'Buena' ? 'status-good' : 'status-danger'}">${l.calidad}</span></td>
-                  <td>${l.consumible ? '<span class="status-good">✓ Si</span>' : '<span class="status-danger">✗ No</span>'}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-        
-        <div class="footer">
-          <p>Este reporte fue generado automaticamente por el Sistema de Monitoreo de Agua.</p>
-          <p>Para informacion adicional, contacte al departamento tecnico de la Universidad Don Bosco.</p>
-        </div>
       </div>
-      <script>
-        window.addEventListener('load', function() {
-          window.print();
-        });
-      </script>
-    </body>
-    </html>
+      
+      <div style="margin-bottom: 25px;">
+        <h2 style="color: #1f2937; font-size: 15px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 15px;">💧 Historico Detallado de Lecturas</h2>
+        <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+          <thead>
+            <tr style="background: #3b82f6; color: white;">
+              <th style="padding: 10px; text-align: left; font-weight: bold;">Fecha/Hora</th>
+              <th style="padding: 10px; text-align: left; font-weight: bold;">Nivel (%)</th>
+              <th style="padding: 10px; text-align: left; font-weight: bold;">Caudal (m³/h)</th>
+              <th style="padding: 10px; text-align: left; font-weight: bold;">pH</th>
+              <th style="padding: 10px; text-align: left; font-weight: bold;">Calidad</th>
+              <th style="padding: 10px; text-align: left; font-weight: bold;">Consumible</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${estado.lecturas.map((l, idx) => `
+              <tr style="background: ${idx % 2 === 0 ? '#ffffff' : '#f9fafb'}; border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 8px 10px;">${l.fecha.toLocaleString('es-SV')}</td>
+                <td style="padding: 8px 10px;"><strong>${l.nivel}%</strong></td>
+                <td style="padding: 8px 10px;">${l.caudal.toFixed(2)}</td>
+                <td style="padding: 8px 10px;">${l.pH}</td>
+                <td style="padding: 8px 10px; color: ${l.calidad === 'Excelente' ? '#10b981' : l.calidad === 'Buena' ? '#10b981' : l.calidad === 'Normal' ? '#f59e0b' : '#ef4444'}; font-weight: bold;">${l.calidad}</td>
+                <td style="padding: 8px 10px; color: ${l.consumible ? '#10b981' : '#ef4444'}; font-weight: bold;">${l.consumible ? '✓ Si' : '✗ No'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      
+      <div style="margin-top: 40px; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 20px; color: #666; font-size: 10px;">
+        <p>Este reporte fue generado automaticamente por el Sistema de Monitoreo de Agua.</p>
+        <p>Para informacion adicional, contacte al departamento tecnico de la Universidad Don Bosco.</p>
+      </div>
+    </div>
   `;
   
-  // Abrir en nueva ventana y permitir imprimir a PDF
-  const ventana = window.open('', '', 'width=800,height=600');
-  ventana.document.write(html);
-  ventana.document.close();
+  // Configurar opciones para html2pdf
+  const opt = {
+    margin: 10,
+    filename: `historico_agua_${new Date().toISOString().slice(0,10)}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+  };
   
-  // Para Chrome y navegadores modernos, esperar a que cargue y luego imprimir
-  setTimeout(() => {
-    ventana.print();
-  }, 500);
+  // Generar y descargar PDF automáticamente
+  html2pdf().set(opt).from(element).save();
 });
