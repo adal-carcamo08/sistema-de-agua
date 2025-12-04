@@ -236,45 +236,51 @@ btnExportPDF.addEventListener('click', () => {
   
   // Crear HTML profesional para convertir a PDF
   let html = `
+    <!DOCTYPE html>
     <html>
     <head>
       <meta charset="UTF-8">
+      <title>Reporte de Agua</title>
       <style>
-        * { margin: 0; padding: 0; }
-        body { font-family: 'Arial', sans-serif; color: #333; line-height: 1.6; }
-        .container { max-width: 800px; margin: 0 auto; padding: 40px; }
-        .header { border-bottom: 3px solid #3b82f6; padding-bottom: 20px; margin-bottom: 30px; }
-        .header h1 { color: #3b82f6; font-size: 28px; margin-bottom: 5px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; background: white; }
+        .container { max-width: 900px; margin: 0 auto; padding: 30px; }
+        .header { border-bottom: 3px solid #3b82f6; padding-bottom: 20px; margin-bottom: 30px; text-align: center; }
+        .header h1 { color: #3b82f6; font-size: 26px; margin-bottom: 5px; }
         .header p { color: #666; font-size: 13px; }
         .info-box { background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 15px; margin-bottom: 20px; }
         .info-box p { margin: 5px 0; font-size: 12px; }
-        .section { margin-bottom: 25px; }
-        .section h2 { color: #1f2937; font-size: 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 15px; }
-        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .section { margin-bottom: 25px; page-break-inside: avoid; }
+        .section h2 { color: #1f2937; font-size: 15px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 15px; }
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .data-item { border: 1px solid #e5e7eb; padding: 12px; border-radius: 6px; background: #fafafa; }
-        .data-label { font-weight: bold; color: #3b82f6; font-size: 12px; }
-        .data-value { font-size: 14px; color: #1f2937; margin-top: 5px; }
+        .data-label { font-weight: bold; color: #3b82f6; font-size: 11px; }
+        .data-value { font-size: 13px; color: #1f2937; margin-top: 5px; }
         .status-good { color: #10b981; font-weight: bold; }
         .status-warning { color: #f59e0b; font-weight: bold; }
         .status-danger { color: #ef4444; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { background: #3b82f6; color: white; padding: 12px; text-align: left; font-size: 12px; }
-        td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11px; }
+        th { background: #3b82f6; color: white; padding: 10px; text-align: left; font-weight: bold; }
+        td { padding: 8px 10px; border-bottom: 1px solid #e5e7eb; }
         tr:nth-child(even) { background: #f9fafb; }
-        .footer { margin-top: 40px; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 20px; color: #666; font-size: 11px; }
+        .footer { margin-top: 40px; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 20px; color: #666; font-size: 10px; }
+        @media print {
+          body { padding: 0; }
+          .container { padding: 20px; }
+        }
       </style>
     </head>
     <body>
       <div class="container">
         <div class="header">
           <h1>SISTEMA DE MONITOREO DE AGUA</h1>
-          <p>Reporte de Datos Históricos · Universidad Don Bosco</p>
+          <p>Reporte de Datos Históricos • Universidad Don Bosco</p>
         </div>
         
         <div class="info-box">
           <p><strong>Fecha de generación:</strong> ${new Date().toLocaleString('es-SV')}</p>
           <p><strong>Total de lecturas:</strong> ${estado.lecturas.length}</p>
-          <p><strong>Período:</strong> ${estado.lecturas[0].fecha.toLocaleString('es-SV')} - ${estado.lecturas[estado.lecturas.length-1].fecha.toLocaleString('es-SV')}</p>
+          <p><strong>Periodo:</strong> ${estado.lecturas[0].fecha.toLocaleString('es-SV')} - ${estado.lecturas[estado.lecturas.length-1].fecha.toLocaleString('es-SV')}</p>
         </div>
         
         <div class="section">
@@ -300,7 +306,7 @@ btnExportPDF.addEventListener('click', () => {
         </div>
         
         <div class="section">
-          <h2>💧 Histórico Detallado de Lecturas</h2>
+          <h2>💧 Historico Detallado de Lecturas</h2>
           <table>
             <thead>
               <tr>
@@ -320,7 +326,7 @@ btnExportPDF.addEventListener('click', () => {
                   <td>${l.caudal.toFixed(2)}</td>
                   <td>${l.pH}</td>
                   <td><span class="${l.calidad === 'Excelente' ? 'status-good' : l.calidad === 'Normal' ? 'status-warning' : l.calidad === 'Buena' ? 'status-good' : 'status-danger'}">${l.calidad}</span></td>
-                  <td>${l.consumible ? '<span class="status-good">✓ Sí</span>' : '<span class="status-danger">✗ No</span>'}</td>
+                  <td>${l.consumible ? '<span class="status-good">✓ Si</span>' : '<span class="status-danger">✗ No</span>'}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -328,20 +334,26 @@ btnExportPDF.addEventListener('click', () => {
         </div>
         
         <div class="footer">
-          <p>Este reporte fue generado automáticamente por el Sistema de Monitoreo de Agua.</p>
-          <p>Para información adicional, contacte al departamento técnico de la Universidad Don Bosco.</p>
+          <p>Este reporte fue generado automaticamente por el Sistema de Monitoreo de Agua.</p>
+          <p>Para informacion adicional, contacte al departamento tecnico de la Universidad Don Bosco.</p>
         </div>
       </div>
+      <script>
+        window.addEventListener('load', function() {
+          window.print();
+        });
+      </script>
     </body>
     </html>
   `;
   
-  // Convertir HTML a PDF usando html2pdf (si no está disponible, usar método alternativo)
-  if (typeof html2pdf !== 'undefined') {
-    html2pdf().setPaper('a4').setMargins(10).fromHtml(html).save(`historico_agua_${new Date().toISOString().slice(0,10)}.pdf`);
-  } else {
-    // Fallback: generar PDF básico
-    const nombre = `historico_agua_${new Date().toISOString().slice(0,10)}.html`;
-    descargarArchivo(html, nombre, 'text/html;charset=utf-8;');
-  }
+  // Abrir en nueva ventana y permitir imprimir a PDF
+  const ventana = window.open('', '', 'width=800,height=600');
+  ventana.document.write(html);
+  ventana.document.close();
+  
+  // Para Chrome y navegadores modernos, esperar a que cargue y luego imprimir
+  setTimeout(() => {
+    ventana.print();
+  }, 500);
 });
