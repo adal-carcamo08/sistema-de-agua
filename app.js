@@ -4,6 +4,9 @@ const nivelTexto = document.getElementById('nivelTexto');
 const nivelBarra = document.getElementById('nivelBarra');
 const caudalTexto = document.getElementById('caudalTexto');
 const estadoAgua = document.getElementById('estadoAgua');
+const calidadAgua = document.getElementById('calidadAgua');
+const nivelepH = document.getElementById('nivelepH');
+const consumible = document.getElementById('consumible');
 const ultimoEnvio = document.getElementById('ultimoEnvio');
 const paquetesEnviados = document.getElementById('paquetesEnviados');
 const dotEstado = document.getElementById('dotEstado');
@@ -51,11 +54,21 @@ function simularLectura () {
   // Caudal entre 0 y 3 m³/h, a veces 0 para simular ausencia de flujo
   let caudal = (Math.random() < 0.15) ? 0 : (0.4 + Math.random() * 2.6);
   caudal = parseFloat(caudal.toFixed(2));
+  
+  // Calidad del agua - simulación
+  const pH = parseFloat((6.5 + Math.random() * 1.5).toFixed(1));
+  const calidadStates = ['Excelente', 'Buena', 'Normal', 'Deficiente'];
+  const calidadIndex = Math.floor(Math.random() * 4);
+  const calidad = calidadStates[calidadIndex];
+  const esConsumible = calidadIndex <= 2; // Excelente, Buena y Normal son consumibles
 
   const lectura = {
     fecha: new Date(),
     nivel,
-    caudal
+    caudal,
+    pH,
+    calidad,
+    consumible: esConsumible
   };
 
   estado.lecturas.push(lectura);
@@ -75,7 +88,7 @@ function simularLectura () {
 
 // Actualiza todos los componentes visuales
 function actualizarUI (lectura) {
-  const { nivel, caudal, fecha } = lectura;
+  const { nivel, caudal, fecha, pH, calidad, consumible } = lectura;
 
   // Nivel
   nivelTexto.textContent = `${nivel} %`;
@@ -104,6 +117,21 @@ function actualizarUI (lectura) {
   }
   estadoAgua.textContent = estadoTexto;
   estadoAgua.style.color = color;
+
+  // Calidad del agua
+  calidadAgua.textContent = calidad;
+  nivelepH.textContent = `${pH}`;
+  
+  let colorCalidad = 'var(--ok)';
+  if (calidad === 'Excelente') colorCalidad = 'var(--ok-light)';
+  else if (calidad === 'Buena') colorCalidad = 'var(--ok)';
+  else if (calidad === 'Normal') colorCalidad = 'var(--warning)';
+  else colorCalidad = 'var(--danger)';
+  
+  calidadAgua.style.color = colorCalidad;
+  const consumibleEl = document.getElementById('consumible');
+  consumibleEl.textContent = consumible ? '✓ Sí' : '✗ No';
+  consumibleEl.style.color = consumible ? 'var(--ok)' : 'var(--danger)';
 
   // Transmisión
   ultimoEnvio.textContent = fecha.toLocaleTimeString('es-SV');
@@ -182,3 +210,138 @@ setInterval(simularLectura, 5000);
 
 // Primera lectura al cargar
 simularLectura();
+
+// === Referencias a elementos de exportación ===
+const btnExportPDF = document.getElementById('btnExportPDF');
+
+// Función para descargar archivo
+function descargarArchivo(contenido, nombre, tipo) {
+  const blob = new Blob([contenido], { type: tipo });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nombre;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Exportar como PDF
+btnExportPDF.addEventListener('click', () => {
+  if (estado.lecturas.length === 0) {
+    alert('No hay datos para exportar.');
+    return;
+  }
+  
+  // Crear HTML profesional para convertir a PDF
+  let html = `
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        * { margin: 0; padding: 0; }
+        body { font-family: 'Arial', sans-serif; color: #333; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; padding: 40px; }
+        .header { border-bottom: 3px solid #3b82f6; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { color: #3b82f6; font-size: 28px; margin-bottom: 5px; }
+        .header p { color: #666; font-size: 13px; }
+        .info-box { background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 15px; margin-bottom: 20px; }
+        .info-box p { margin: 5px 0; font-size: 12px; }
+        .section { margin-bottom: 25px; }
+        .section h2 { color: #1f2937; font-size: 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 15px; }
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .data-item { border: 1px solid #e5e7eb; padding: 12px; border-radius: 6px; background: #fafafa; }
+        .data-label { font-weight: bold; color: #3b82f6; font-size: 12px; }
+        .data-value { font-size: 14px; color: #1f2937; margin-top: 5px; }
+        .status-good { color: #10b981; font-weight: bold; }
+        .status-warning { color: #f59e0b; font-weight: bold; }
+        .status-danger { color: #ef4444; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #3b82f6; color: white; padding: 12px; text-align: left; font-size: 12px; }
+        td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 12px; }
+        tr:nth-child(even) { background: #f9fafb; }
+        .footer { margin-top: 40px; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 20px; color: #666; font-size: 11px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>SISTEMA DE MONITOREO DE AGUA</h1>
+          <p>Reporte de Datos Históricos · Universidad Don Bosco</p>
+        </div>
+        
+        <div class="info-box">
+          <p><strong>Fecha de generación:</strong> ${new Date().toLocaleString('es-SV')}</p>
+          <p><strong>Total de lecturas:</strong> ${estado.lecturas.length}</p>
+          <p><strong>Período:</strong> ${estado.lecturas[0].fecha.toLocaleString('es-SV')} - ${estado.lecturas[estado.lecturas.length-1].fecha.toLocaleString('es-SV')}</p>
+        </div>
+        
+        <div class="section">
+          <h2>📊 Resumen de Indicadores</h2>
+          <div class="data-grid">
+            <div class="data-item">
+              <div class="data-label">Consumo Estimado Hoy</div>
+              <div class="data-value">${estado.consumoHoy.toFixed(2)} m³</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">Consumo Estimado Mes</div>
+              <div class="data-value">${estado.consumoMes.toFixed(2)} m³</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">Nivel Promedio Tanque</div>
+              <div class="data-value">${(estado.lecturas.reduce((s, l) => s + l.nivel, 0) / estado.lecturas.length).toFixed(1)}%</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">Caudal Promedio</div>
+              <div class="data-value">${(estado.lecturas.reduce((s, l) => s + l.caudal, 0) / estado.lecturas.length).toFixed(2)} m³/h</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="section">
+          <h2>💧 Histórico Detallado de Lecturas</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha/Hora</th>
+                <th>Nivel (%)</th>
+                <th>Caudal (m³/h)</th>
+                <th>pH</th>
+                <th>Calidad</th>
+                <th>Consumible</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${estado.lecturas.map(l => `
+                <tr>
+                  <td>${l.fecha.toLocaleString('es-SV')}</td>
+                  <td><strong>${l.nivel}%</strong></td>
+                  <td>${l.caudal.toFixed(2)}</td>
+                  <td>${l.pH}</td>
+                  <td><span class="${l.calidad === 'Excelente' ? 'status-good' : l.calidad === 'Normal' ? 'status-warning' : l.calidad === 'Buena' ? 'status-good' : 'status-danger'}">${l.calidad}</span></td>
+                  <td>${l.consumible ? '<span class="status-good">✓ Sí</span>' : '<span class="status-danger">✗ No</span>'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="footer">
+          <p>Este reporte fue generado automáticamente por el Sistema de Monitoreo de Agua.</p>
+          <p>Para información adicional, contacte al departamento técnico de la Universidad Don Bosco.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+  
+  // Convertir HTML a PDF usando html2pdf (si no está disponible, usar método alternativo)
+  if (typeof html2pdf !== 'undefined') {
+    html2pdf().setPaper('a4').setMargins(10).fromHtml(html).save(`historico_agua_${new Date().toISOString().slice(0,10)}.pdf`);
+  } else {
+    // Fallback: generar PDF básico
+    const nombre = `historico_agua_${new Date().toISOString().slice(0,10)}.html`;
+    descargarArchivo(html, nombre, 'text/html;charset=utf-8;');
+  }
+});

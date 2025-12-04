@@ -9,7 +9,7 @@
 <body>
 <div class="app">
   <header>
-    <h1>DISEÑO TÉCNICO Y PROTOTIPO · SISTEMA DE MONITOREO DE AGUA</h1>
+    <h1>DISEÑO TÉCNICO Y PROTOTIPO · SISTEMA DE MONITOREO Y GESTIÓN INTELIGENTE DE AGUA</h1>
     <span id="clock"></span>
   </header>
 
@@ -43,6 +43,23 @@
         <div class="metric-row">
           <span class="metric-label">Estado general del agua</span>
           <span class="metric-value" id="estadoAgua">–</span>
+        </div>
+      </div>
+
+      <div>
+        <p class="section-title">Sensor de calidad del agua</p>
+        <p class="small">Monitoreo del estado y pureza del agua en el sistema.</p>
+        <div class="metric-row">
+          <span class="metric-label">Estado de calidad</span>
+          <span class="metric-value" id="calidadAgua">–</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Nivel de pureza (pH)</span>
+          <span class="metric-value" id="nivelepH">7.0</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Consumible</span>
+          <span class="metric-value" id="consumible">✓ Sí</span>
         </div>
       </div>
 
@@ -100,6 +117,15 @@
         <p class="small">Cada barra representa una lectura almacenada (porcentaje de llenado).</p>
         <div class="history" id="historial">
           <!-- Barras generadas dinámicamente -->
+        </div>
+        
+        <div class="export-options">
+          <p class="export-title">Descargar datos históricos</p>
+          <div class="export-buttons">
+            <button class="btn-export" id="btnExportPDF" title="Descargar como PDF">
+              <span class="icon">📄</span> PDF
+            </button>
+          </div>
         </div>
       </div>
 
