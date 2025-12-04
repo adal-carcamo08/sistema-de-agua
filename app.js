@@ -245,6 +245,11 @@ btnExportPDF.addEventListener('click', () => {
     return;
   }
   
+  // Asegurar que hay alertas para demostración si no hay ninguna
+  if (estado.alertas.length === 0) {
+    registrarAlerta('Automática', 'Lectura de muestra generada para reporte de prueba.');
+  }
+  
   // Crear HTML profesional para convertir a PDF
   let html = `
     <!DOCTYPE html>
@@ -270,6 +275,7 @@ btnExportPDF.addEventListener('click', () => {
         .status-good { color: #10b981; font-weight: bold; }
         .status-warning { color: #f59e0b; font-weight: bold; }
         .status-danger { color: #ef4444; font-weight: bold; }
+        .alerts-section th { background: #ef4444; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11px; }
         th { background: #3b82f6; color: white; padding: 10px; text-align: left; font-weight: bold; }
         td { padding: 8px 10px; border-bottom: 1px solid #e5e7eb; }
