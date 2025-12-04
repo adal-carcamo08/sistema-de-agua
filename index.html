@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Monitoreo de Agua – Prototipo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>DISEÑO TÉCNICO Y PROTOTIPO · SISTEMA DE MONITOREO DE AGUA</h1>
+    <span id="clock"></span>
+  </header>
+
+  <main>
+    <!-- 1. TRANSMISIÓN DE DATOS -->
+    <section class="card">
+      <h2>Transmisión de datos</h2>
+      <p class="subtitle">
+        Sensores de nivel de tanques y caudal envían lecturas periódicas hacia la plataforma de monitoreo.
+      </p>
+
+      <div>
+        <p class="section-title">Sensores de nivel de tanque</p>
+        <p class="small">Medir de manera constante el nivel del agua.</p>
+        <div class="metric-row">
+          <span class="metric-label">Nivel actual del tanque</span>
+          <span class="metric-value" id="nivelTexto">0 %</span>
+        </div>
+        <div class="progress">
+          <div class="progress-bar" id="nivelBarra"></div>
+        </div>
+      </div>
+
+      <div>
+        <p class="section-title">Sensores de caudal</p>
+        <p class="small">Verificar la medición del volumen que circula a través del sistema.</p>
+        <div class="metric-row">
+          <span class="metric-label">Caudal instantáneo</span>
+          <span class="metric-value" id="caudalTexto">0.0 m³/h</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Estado general del agua</span>
+          <span class="metric-value" id="estadoAgua">–</span>
+        </div>
+      </div>
+
+      <div>
+        <p class="section-title">Plataforma de monitoreo</p>
+        <p class="small">
+          Transmitir periódicamente los datos a través de módulos de comunicación (red celular / Wi-Fi).
+        </p>
+        <div class="metric-row">
+          <span class="metric-label">Último envío</span>
+          <span class="metric-value" id="ultimoEnvio">–</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Paquetes enviados</span>
+          <span class="metric-value" id="paquetesEnviados">0</span>
+        </div>
+        <span class="pill">
+          <span class="status-dot" id="dotEstado"></span>
+          Enlace de comunicación simulado
+        </span>
+      </div>
+
+      <button class="btn" id="btnSimular">Simular lectura ahora</button>
+    </section>
+
+    <!-- 2. ALMACENAMIENTO Y VISUALIZACIÓN DE DATOS -->
+    <section class="card">
+      <h2>Almacenamiento y visualización de datos</h2>
+      <p class="subtitle">
+        Paneles de control que almacenan los datos y muestran indicadores claves (niveles y caudales).
+      </p>
+
+      <div>
+        <p class="section-title">Indicadores clave</p>
+        <div class="metric-row">
+          <span class="metric-label">Consumo estimado hoy</span>
+          <span class="metric-value" id="consumoHoy">0.0 m³</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Consumo estimado mes</span>
+          <span class="metric-value" id="consumoMes">0.0 m³</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Lecturas almacenadas</span>
+          <span class="metric-value" id="lecturasTotales">0</span>
+        </div>
+        <div class="metric-row">
+    <span class="metric-label">Usuarios activos</span>
+    <span class="metric-value" id="usuariosActivos">125 hogares</span>
+  </div>
+      </div>
+
+      <div>
+        <p class="section-title">Histórico reciente del nivel del tanque</p>
+        <p class="small">Cada barra representa una lectura almacenada (porcentaje de llenado).</p>
+        <div class="history" id="historial">
+          <!-- Barras generadas dinámicamente -->
+        </div>
+      </div>
+
+      <button class="btn btn-outline" id="btnLimpiarHistorial">Limpiar histórico</button>
+    </section>
+
+    <!-- 3. ALERTAS Y MEDIDAS -->
+    <section class="card">
+      <h2>Alertas y medidas</h2>
+      <p class="subtitle">
+        Sistema de alertas ante situaciones de riesgo (bajo nivel de tanque y ausencia de caudal) y
+        comunicación a los responsables.
+      </p>
+
+      <div>
+        <p class="section-title">Condiciones de alerta configuradas</p>
+        <ul class="small" style="margin-left:16px;margin-top:4px;">
+          <li>• Nivel de tanque &lt; 25 % → Riesgo de desabastecimiento.</li>
+          <li>• Caudal = 0.0 m³/h con nivel &gt; 40 % → Posible falla de bomba o válvula cerrada.</li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="section-title">Alertas generadas</p>
+        <ul class="alert-list" id="listaAlertas">
+          <li class="no-alerts" id="noAlertas">Sin alertas registradas.</li>
+        </ul>
+      </div>
+
+      <button class="btn btn-outline" id="btnAlertaManual">Registrar alerta manual</button>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-left">
+        <div class="logo-section">
+          <img src="https://www.udb.edu.sv/udb_files/content_resource/es//Logo_8.5.jpg" alt="Logo Don Bosco" class="logo-img">
+          <div>
+            <p class="logo-text">Universidad Don Bosco</p>
+            <p class="logo-subtitle">Sistema de monitoreo y gestión inteligente de agua en comunidades rurales de El Salvador</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-center">
+        <p class="footer-description">Prototipo web: medición de nivel y caudal · transmisión de datos · almacenamiento · alertas automáticas.</p>
+      </div>
+
+      <div class="footer-right">
+        <p class="team-title">Equipo del Proyecto</p>
+        <div class="team-members">
+          <span class="member">Adal Isaac Cárcamo Sánchez</span>
+          <span class="member">Fernando José López Domínguez</span>
+          <span class="member">Víctor Manuel Tobar Casco</span>
+          <span class="member">Fernando Josue Quintanilla Avalos</span>
+          <span class="member">Edwin Leonardo Peñate Flores</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="copyright">© 2025 Sistema de Agua. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
