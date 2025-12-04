@@ -28,7 +28,8 @@ const estado = {
   lecturas: [],
   paquetes: 0,
   consumoHoy: 0,
-  consumoMes: 0
+  consumoMes: 0,
+  alertas: []
 };
 
 // Reloj en header
@@ -179,6 +180,16 @@ function registrarAlerta (origen, mensaje) {
   if (noAlertas) {
     noAlertas.remove();
   }
+  
+  // Guardar alerta en el estado
+  const alerta = {
+    origen: origen,
+    mensaje: mensaje,
+    fecha: new Date(),
+    hora: fechaCorta()
+  };
+  estado.alertas.unshift(alerta); // Agregar al inicio
+  
   const li = document.createElement('li');
   li.className = 'alert-item';
   li.innerHTML = `
@@ -332,6 +343,32 @@ btnExportPDF.addEventListener('click', () => {
             </tbody>
           </table>
         </div>
+
+        ${estado.alertas.length > 0 ? `
+        <div class="section alerts-section">
+          <h2>⚠️ Alertas Generadas</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Origen</th>
+                <th>Mensaje</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${estado.alertas.map(a => `
+                <tr>
+                  <td>${a.fecha.toLocaleDateString('es-SV')}</td>
+                  <td>${a.hora}</td>
+                  <td><strong>${a.origen}</strong></td>
+                  <td>${a.mensaje}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        ` : ''}
         
         <div class="footer">
           <p>Este reporte fue generado automaticamente por el Sistema de Monitoreo de Agua.</p>
