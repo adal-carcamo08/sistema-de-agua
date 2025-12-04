@@ -347,13 +347,15 @@ btnExportPDF.addEventListener('click', () => {
     </html>
   `;
   
-  // Abrir en nueva ventana y permitir imprimir a PDF
-  const ventana = window.open('', '', 'width=800,height=600');
-  ventana.document.write(html);
-  ventana.document.close();
-  
-  // Para Chrome y navegadores modernos, esperar a que cargue y luego imprimir
-  setTimeout(() => {
-    ventana.print();
-  }, 500);
+  // Descargar como HTML directamente
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', `historico_agua_${new Date().toISOString().slice(0,10)}.html`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 });
